@@ -8,4 +8,11 @@ endif
 include .env
 
 start-db:
-	$(DOCKER_COMPOSE) -p$(service) -f docker-compose-database.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
+	$(DOCKER_COMPOSE) -p$(service) \
+          -f docker-compose-database.yml \
+          -f docker-compose-dev.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
+
+stop-db:
+	$(DOCKER_COMPOSE) -p$(service) \
+          -f docker-compose-database.yml \
+          -f docker-compose-dev.yml down

@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  audit:
+    image: ${service}
+    hostname: ${domain}.${host}
+    container_name: ${domain}.${host}
+    ports:
+      - ${port}:${port}
+    environment:
+      - DATABASE=${database} 
+      - HOST=${dbdomain}.${host} 
+      - PORT=${dbport} 
+      - USER=${dbuser}
+      - PASSWORD=${dbpassword}
+      - SERVICEHOST=${domain}.${host}
+      - SERVICEPORT=${port}
+    tty: true
+networks:
+  backend:
+    driver: bridge
