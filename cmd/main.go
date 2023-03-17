@@ -8,11 +8,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	log *zap.Logger
-)
-
 func main() {
+
+	log := zap.NewExample()
+
 	configSetup := config.NewConfigSetup(log, "sql-manager")
 
 	configSetup.GetConfiguration()

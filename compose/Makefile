@@ -7,12 +7,17 @@ endif
 
 include .env
 
-start-db:
-	$(DOCKER_COMPOSE) -p$(service) \
-          -f docker-compose-database.yml \
-          -f docker-compose-dev.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
-
-stop-db:
+stop:
 	$(DOCKER_COMPOSE) -p$(service) \
           -f docker-compose-database.yml \
           -f docker-compose-dev.yml down
+
+start-db:
+	$(DOCKER_COMPOSE) -p$(service) \
+          -f docker-compose-database.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
+
+start-app:
+	$(DOCKER_COMPOSE) -p$(service) \
+          -f docker-compose-dev.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
+
+.PHONY: stop start-db start-app slp

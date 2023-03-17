@@ -35,6 +35,7 @@ func NewConfigSetup(Log *zap.Logger, ServiceName string) *Config {
 }
 
 func (c *Config) EnvConfiguration() {
+	c.Log.Info("ENV")
 	if c.Creden.Database = os.Getenv("DATABASE"); c.Creden.Database == "" {
 		c.Log.Fatal("Database environment variable not set")
 	}
