@@ -1,9 +1,11 @@
 package main
 
 import (
+	"os/signal"
 	"sql-service/app"
 	"sql-service/config"
 	"sql-service/database"
+	"syscall"
 
 	"go.uber.org/zap"
 )
@@ -17,6 +19,7 @@ func main() {
 	configSetup.GetConfiguration()
 
 	if err := app.MapURL(configSetup, database.Connection(configSetup)).ListenAndServe(); err != nil {
-		log.Fatal("Service terminated", zap.Error(err))
+		log.Error("Service terminated", zap.Error(err))
+		signal.Notify(app.StopService, syscall.SIGINT, syscall.SIGTERM)
 	}
 }

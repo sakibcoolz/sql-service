@@ -14,6 +14,7 @@ type DBInstance struct {
 }
 
 func Connection(configSetup *config.Config) *DBInstance {
+
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		configSetup.Creden.User,
 		configSetup.Creden.Password,
