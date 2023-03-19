@@ -38,6 +38,8 @@ func MapURL(configSetup *config.Config, db *database.DBInstance) *http.Server {
 
 	router.HandleFunc("/health", controller.Health).Methods("GET")
 
+	router.HandleFunc("/sqlconsole", controller.SQLConsole).Methods("GET")
+
 	return &http.Server{
 		Handler: router,
 		Addr:    fmt.Sprintf("%s:%d", configSetup.Service.Host, configSetup.Service.Port),

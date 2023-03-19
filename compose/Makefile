@@ -16,4 +16,4 @@ start:
 	$(DOCKER_COMPOSE) -p$(service) \
           -f docker-compose-dev.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
 
-.PHONY: stop start-db start-app slp
+.PHONY: stop start

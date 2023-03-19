@@ -1,5 +1,5 @@
 include compose/.env
-include common.mk
+include variables.mk
 
 run: 
 	DATABASE=$(database) \
