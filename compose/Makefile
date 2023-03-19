@@ -9,14 +9,10 @@ include .env
 
 stop:
 	$(DOCKER_COMPOSE) -p$(service) \
-          -f docker-compose-database.yml \
           -f docker-compose-dev.yml down
 
-start-db:
-	$(DOCKER_COMPOSE) -p$(service) \
-          -f docker-compose-database.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
 
-start-app:
+start:
 	$(DOCKER_COMPOSE) -p$(service) \
           -f docker-compose-dev.yml up $(DOCKER_COMPOSE_QUIET_PULL) -d
 
