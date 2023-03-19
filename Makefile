@@ -23,5 +23,13 @@ docker-start:
 docker-stop:
 	make -C compose stop
 
+kick-start: docker-image docker-start
+
+clean:
+	@docker rmi -f $(service)
+	@docker rmi -f $(database)
+	@docker image prune -f
+	
+
 .PHONY: run
 
