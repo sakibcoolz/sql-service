@@ -18,7 +18,7 @@ type Request struct {
 	Type string `json:"type"`
 }
 ``` 
-
+## Response Body
 ```
 type Response struct {
 	Data string `json:"data"` // Data in stringify json format
