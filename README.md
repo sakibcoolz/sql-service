@@ -6,7 +6,7 @@
 - Native Application use this as database.
 
 ## Supported databases.
-- MySql
+- MySQL
 - SQL Lite
 - Postgre SQL
 
