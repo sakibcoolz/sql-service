@@ -99,9 +99,12 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 	for resultset.Next() {
 		values := make([]interface{}, len(columns))
 
-		resultValue := make(map[string]string)
+		resultValue := make(map[string]interface{})
 
 		values = utils.AssigningRawByte(values)
+
+		columnType, err := resultset.ColumnTypes()
+		fmt.Println("🚀 ~ file: console_dao.go ~ line 107 ~ forresultset.Next ~ data, err : ", columnType, err)
 
 		if err := resultset.Scan(values...); err != nil {
 			log.Error("Implementation Error", zap.Error(err))
@@ -114,7 +117,22 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 
 			data, checker := resultValue[columns[idx]]
 			if checker != true {
-				resultValue[columns[idx]] = string(*content)
+
+				columntype := *columnType[idx]
+
+				switch columntype.DatabaseTypeName() {
+				case "INT":
+					resultValue[columns[idx]] = int(content) // Assuming INT is 64-bit
+				case "VARCHAR", "TEXT":
+					resultValue[columns[idx]] = string(*content)
+				case "BOOL":
+					resultValue[columns[idx]] = bool(content.Bool())
+				case "FLOAT", "DOUBLE":
+					resultValue[columns[idx]] = float64(content.Float64())
+				// Add more cases for other types as needed
+				default:
+
+				}
 
 				continue
 			}
