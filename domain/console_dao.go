@@ -60,16 +60,6 @@ func (DB *DBInstance) Console(sql string) model.Response {
 		}
 	}
 
-	// stringify, err := utils.DataTojson(DB.Log, data)
-	// if err != nil {
-	// 	DB.Log.Error("error while generating JSON string", zap.Error(err))
-
-	// 	return model.Response{
-	// 		Data: nil,
-	// 		Msg:  err.Error(),
-	// 	}
-	// }
-
 	return model.Response{
 		Data: data,
 		Msg:  "Successfully Executed",
@@ -104,8 +94,7 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 
 		values = utils.AssigningRawByte(values)
 
-		columnType, err := resultset.ColumnTypes()
-		fmt.Println("🚀 ~ file: console_dao.go ~ line 107 ~ forresultset.Next ~ data, err : ", columnType, err)
+		columnType, _ := resultset.ColumnTypes()
 
 		if err := resultset.Scan(values...); err != nil {
 			log.Error("Implementation Error", zap.Error(err))
@@ -118,9 +107,7 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 
 			data, checker := resultValue[columns[idx]]
 			if checker != true {
-
 				columntype := *columnType[idx]
-
 				switch columntype.DatabaseTypeName() {
 				case "INT":
 					strValue := string(*content)
@@ -128,7 +115,7 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 					resultValue[columns[idx]] = intValue // Assuming INT is 64-bit
 				case "VARCHAR", "TEXT":
 					resultValue[columns[idx]] = string(*content)
-				case "BOOL":
+				case "BOOL", "TINYINT":
 					strValue := string(*content)
 					boolValue, _ := strconv.ParseBool(strValue)
 					resultValue[columns[idx]] = boolValue
@@ -136,7 +123,11 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 					strValue := string(*content)
 					floatValue, _ := strconv.ParseFloat(strValue, 64)
 					resultValue[columns[idx]] = floatValue
-				// Add more cases for other types as needed
+					// Add more cases for other types as needed
+				case "TIMESTAMP", "DATETIME":
+					resultValue[columns[idx]] = string(*content)
+				case "BLOB", "VARBINARY":
+					resultValue[columns[idx]] = string(*content)
 				default:
 					resultValue[columns[idx]] = string(*content)
 				}

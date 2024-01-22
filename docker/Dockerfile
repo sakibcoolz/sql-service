@@ -11,6 +11,7 @@ FROM alpine:latest
 LABEL Name=sql-manager Version=0.0.1
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /app/sqlmanager sqlmanager
+COPY --from=builder /app/mysqlsampledatabase.sql mysqlsampledatabase.sql
 EXPOSE 8080
 ENTRYPOINT ["/sqlmanager"]
 
