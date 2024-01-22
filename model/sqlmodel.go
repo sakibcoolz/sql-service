@@ -6,6 +6,6 @@ type Request struct {
 }
 
 type Response struct {
-	Data string `json:"data"`
-	Msg  string `json:"msg"`
+	Data []interface{} `json:"data"`
+	Msg  string        `json:"msg"`
 }

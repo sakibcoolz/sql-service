@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"sql-service/model"
 	"sql-service/utils"
+	"strconv"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -34,7 +35,7 @@ func (DB *DBInstance) Console(sql string) model.Response {
 		DB.Log.Error("Error while fetching result set", zap.Error(err))
 
 		return model.Response{
-			Data: "",
+			Data: nil,
 			Msg:  err.Error(),
 		}
 	}
@@ -48,29 +49,29 @@ func (DB *DBInstance) Console(sql string) model.Response {
 			DB.Log.Error("Uable to Unmarshal columns", zap.Error(err))
 
 			return model.Response{
-				Data: "",
+				Data: nil,
 				Msg:  err.Error(),
 			}
 		}
 
 		return model.Response{
-			Data: fmt.Sprintf("[%s]", data),
+			Data: []interface{}{data},
 			Msg:  "Successfully Executed",
 		}
 	}
 
-	stringify, err := utils.DataTojson(DB.Log, data)
-	if err != nil {
-		DB.Log.Error("error while generating JSON string", zap.Error(err))
+	// stringify, err := utils.DataTojson(DB.Log, data)
+	// if err != nil {
+	// 	DB.Log.Error("error while generating JSON string", zap.Error(err))
 
-		return model.Response{
-			Data: stringify,
-			Msg:  err.Error(),
-		}
-	}
+	// 	return model.Response{
+	// 		Data: nil,
+	// 		Msg:  err.Error(),
+	// 	}
+	// }
 
 	return model.Response{
-		Data: stringify,
+		Data: data,
 		Msg:  "Successfully Executed",
 	}
 }
@@ -99,9 +100,12 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 	for resultset.Next() {
 		values := make([]interface{}, len(columns))
 
-		resultValue := make(map[string]string)
+		resultValue := make(map[string]interface{})
 
 		values = utils.AssigningRawByte(values)
+
+		columnType, err := resultset.ColumnTypes()
+		fmt.Println("🚀 ~ file: console_dao.go ~ line 107 ~ forresultset.Next ~ data, err : ", columnType, err)
 
 		if err := resultset.Scan(values...); err != nil {
 			log.Error("Implementation Error", zap.Error(err))
@@ -114,14 +118,35 @@ func DescribeResultSet(resultset *sql.Rows, columns []string, log *zap.Logger) [
 
 			data, checker := resultValue[columns[idx]]
 			if checker != true {
-				resultValue[columns[idx]] = string(*content)
+
+				columntype := *columnType[idx]
+
+				switch columntype.DatabaseTypeName() {
+				case "INT":
+					strValue := string(*content)
+					intValue, _ := strconv.Atoi(strValue)
+					resultValue[columns[idx]] = intValue // Assuming INT is 64-bit
+				case "VARCHAR", "TEXT":
+					resultValue[columns[idx]] = string(*content)
+				case "BOOL":
+					strValue := string(*content)
+					boolValue, _ := strconv.ParseBool(strValue)
+					resultValue[columns[idx]] = boolValue
+				case "FLOAT", "DOUBLE":
+					strValue := string(*content)
+					floatValue, _ := strconv.ParseFloat(strValue, 64)
+					resultValue[columns[idx]] = floatValue
+				// Add more cases for other types as needed
+				default:
+					resultValue[columns[idx]] = string(*content)
+				}
 
 				continue
 			}
 
 			data = string(*content)
 
-			log.Info("Found Data :", zap.String("Data", data))
+			log.Info("Found Data :", zap.Any("Data", data))
 
 			resultValue[columns[idx]] = data
 		}
@@ -141,7 +166,7 @@ func (DB *DBInstance) ConsoleDML(sql string) model.Response {
 		DB.Log.Error("Error on DML query", zap.Error(err))
 
 		return model.Response{
-			Data: "",
+			Data: nil,
 			Msg:  err.Error(),
 		}
 	}
@@ -149,7 +174,7 @@ func (DB *DBInstance) ConsoleDML(sql string) model.Response {
 	affected, _ := result.RowsAffected()
 
 	return model.Response{
-		Data: "",
+		Data: nil,
 		Msg:  fmt.Sprintf("Affected Records : %d", affected),
 	}
 }
